@@ -37,12 +37,14 @@ class camera {
     double pixel_samples_scale;
     vec3   pixel_delta_u;  // Offset to pixel to the right
     vec3   pixel_delta_v;  // Offset to pixel below
+    color sky;
 
     void initialize() {
         image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
         pixel_samples_scale = 1.0 / samples_per_pixel;
 
+        sky = color(44,198,230) / color(255,255,255);
         center = point3(0, 0, 0);
 
         // Determine viewport dimensions.
@@ -88,12 +90,16 @@ class camera {
         if (iter <= 0) return color(0, 0, 0);
         hit_record record;
         if (world.hit(r, interval(0.001, infinity), record)) {
-            vec3 dir = random_on_hemisphere(record.normal);
-            return 0.5 * ray_color(ray(record.p, dir), world, iter - 1);
+            color attenuation;
+            ray scattered;
+            if (record.mat->scatter(r, record, attenuation, scattered)) {
+                return attenuation * ray_color(scattered, world, iter - 1);
+            }
+            return color(0, 0, 0);
         }
         vec3 unit_direction = unit_vector(r.direction());
         auto a = 0.5*(unit_direction.y() + 1.0);
-        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+        return (1.0-a)*color(1.0, 1.0, 1.0) + a*sky;
     }
 };
 
