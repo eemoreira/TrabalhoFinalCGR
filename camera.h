@@ -5,7 +5,6 @@
 
 class camera {
   public:
-      /* Public Camera Parameters Here */
       double   aspect_ratio = 1.0;  // Ratio of image width over height
       int      image_width  = 100;  // Rendered image width in pixel count
       int samples_per_pixel = 10;
@@ -17,7 +16,8 @@ class camera {
           std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
           for (int j = 0; j < image_height; j++) {
-              std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+              std::cerr << "\rScanlines remaining: " << (image_height - j);
+              std::cerr.flush();
               for (int i = 0; i < image_width; i++) {
                   color pixel(0, 0, 0);
                   for (int sample = 0; sample < samples_per_pixel; sample++) {
@@ -27,7 +27,7 @@ class camera {
               }
           }
 
-          std::clog << "\rDone.                 \n";
+          std::cerr << "\rDone.                 \n";
       }
 
   private:
